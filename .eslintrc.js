@@ -31,5 +31,6 @@ module.exports = {
             },
         ],
         'no-underscore-dangle': ['error', { allow: ['_id', '_statusCode'] }],
+        'no-console': 'off',
     },
 };
