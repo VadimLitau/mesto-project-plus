@@ -1,14 +1,28 @@
-import http from 'http';
-import { MongoClient } from 'mongodb';
+import express, { NextFunction, Response, json } from 'express';
+import mongoose from 'mongoose';
+// eslint-disable-next-line import/extensions, import/named
+import user from './routes/users';
+import card from './routes/card';
 
-const client = new MongoClient('mongodb://localhost:27017/mestodb');
+mongoose.connect('mongodb://localhost:27017/mestodb', { family: 4 });
 
-await client.connect();
+const { PORT = 3000 } = process.env;
 
-// const db = client.db('myDatabase');
-// db.users;
-const server = http.createServer(() => {
-  console.log('Пришёл запрос!');
+const app = express();
+
+app.use((req: any, _res: Response, next: NextFunction) => {
+  req.user = {
+    _id: '63c28319509f35db6723c147',
+  };
+
+  next();
 });
 
-server.listen(3000);
+app.use(json());
+app.use('/users', user);
+app.use('/card', card);
+
+app.listen(PORT, () => {
+  console.log('Ссылка на сервер:');
+  console.log(PORT);
+});

@@ -1,11 +1,12 @@
+import { Schema } from 'mongoose';
 import IUser from './user';
 
 interface ICard {
   name: string,
   link: string,
   owner: IUser,
-  likes: string[],
-  data: object,
+  likes: [Schema.Types.ObjectId],
+  createdAt: Schema.Types.Date,
 }
 
 export default ICard;

@@ -1,9 +1,8 @@
-import { ObjectId } from 'mongodb';
-import mongoose from 'mongoose';
+import { model, Schema } from 'mongoose';
 // eslint-disable-next-line import/no-unresolved
 import ICard from 'types/card';
 
-const card = new mongoose.Schema({
+const cardShema = new Schema<ICard>({
   name: {
     type: String,
     required: true,
@@ -15,11 +14,12 @@ const card = new mongoose.Schema({
     required: true,
   },
   owner: {
-    type: ObjectId,
+    type: Schema.Types.ObjectId,
+    ref: 'user',
     required: true,
   },
   likes: {
-    type: ObjectId,
+    type: [{ type: Schema.Types.ObjectId, ref: 'user' }],
     default: [],
   },
   createdAt: {
@@ -28,4 +28,4 @@ const card = new mongoose.Schema({
   },
 });
 
-export default mongoose.model<ICard>('user', card);
+export default model<ICard>('card', cardShema);

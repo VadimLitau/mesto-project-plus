@@ -1,8 +1,9 @@
-import mongoose from 'mongoose';
-// eslint-disable-next-line import/no-unresolved
-import IUser from 'types/user';
+import { model, Schema } from 'mongoose';
 
-const user = new mongoose.Schema({
+// eslint-disable-next-line import/no-unresolved, import/no-named-as-default
+import { IUser } from '../types/user';
+
+const userSchema = new Schema<IUser>({
   name: {
     type: String,
     required: true,
@@ -21,4 +22,4 @@ const user = new mongoose.Schema({
   },
 });
 
-export default mongoose.model<IUser>('user', user);
+export default model<IUser>('User', userSchema);
