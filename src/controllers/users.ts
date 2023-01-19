@@ -44,7 +44,7 @@ const updateUser = (req: RequestCustom, res: Response) => {
   User.findByIdAndUpdate(req.user?._id, { name, about }, { new: true, runValidators: true })
     .then((user) => res.send(user))
     .catch((err) => {
-      if (err.name === 'CastError') {
+      if (err.name === 'ValidationError') {
         return res.status(400).send({ message: 'Произошла ошибка: неверно заполнены поля' });
       }
       res.status(500).send({ message: 'Произошла ошибка' });

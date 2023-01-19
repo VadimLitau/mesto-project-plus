@@ -44,10 +44,10 @@ const addLikeCard = (req: any, res: Response) => {
     { $addToSet: { likes: req.user._id } },
     { new: true, runValidators: true },
   )
-    .orFail(new Error('notValidId'))
+    .orFail(new Error('CastError'))
     .then((card) => res.send(card?.likes))
     .catch((error) => {
-      if (error.message === 'notValidId') {
+      if (error.message === 'CastError') {
         return res.status(404).send({ message: 'Не валидный id карточки' });
       }
       return res.status(500).send({ message: 'Произошла ошибка' });
@@ -60,10 +60,10 @@ const deleteLikeCard = (req: any, res: Response) => {
     { $pull: { likes: req.user._id } },
     { new: true, runValidators: true },
   )
-    .orFail(new Error('notValidId'))
+    .orFail(new Error('CastError'))
     .then((card) => res.send(card?.likes))
     .catch((error) => {
-      if (error.message === 'notValidId') {
+      if (error.message === 'CastError') {
         return res.status(404).send({ message: 'Не валидный id карточки' });
       }
       return res.status(500).send({ message: 'Произошла ошибка' });
