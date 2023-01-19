@@ -20,7 +20,11 @@ app.use((req: any, _res: Response, next: NextFunction) => {
 
 app.use(json());
 app.use('/users', user);
-app.use('/card', card);
+app.use('/cards', card);
+
+app.get('*', (_req: any, _res: Response) => {
+  _res.status(404).send({ message: 'Запрашиваемый ресурс не найден' });
+});
 
 app.listen(PORT, () => {
   console.log('Ссылка на сервер:');

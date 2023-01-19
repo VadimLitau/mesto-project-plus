@@ -1,7 +1,7 @@
 import { Response, Request } from 'express';
 import { RequestCustom } from '../types/user';
-// eslint-disable-next-line import/extensions, import/no-unresolved
 import Card from '../models/card';
+// eslint-disable-next-line import/extensions, import/no-unresolved
 // eslint-disable-next-line max-len
 const createCard = (req: RequestCustom, res: Response) => {
   const { name, link } = req.body;
@@ -11,7 +11,12 @@ const createCard = (req: RequestCustom, res: Response) => {
     name, link, owner: req.user?._id, createdAt,
   })
     .then((card) => res.send({ card }))
-    .catch(() => res.status(400).send({ message: 'Произошла ошибка: неверно заполнены поля' }));
+    .catch((error) => {
+      if (error.name === 'ValidationError') {
+        return res.status(400).send({ message: 'Произошла ошибка: неверно заполнены поля' });
+      }
+      return res.status(500).send({ message: 'Произошла ошибка' });
+    });
 };
 
 const findCards = (req: Request, res: Response) => Card.find({})
@@ -19,9 +24,18 @@ const findCards = (req: Request, res: Response) => Card.find({})
   .catch(() => res.status(404).send({ message: 'Произошла ошибка: неверно заполнены поля' }));
 
 const deleteCard = (req: Request, res: Response) => {
-  Card.findByIdAndDelete(req.params.cardId)
-    .then((card) => res.send(card))
-    .catch(() => res.status(404).send({ message: 'Произошла ошибка: карточка не найден' }));
+  const { cardId } = req.params;
+  Card.findByIdAndDelete({ _id: cardId })
+    .orFail(new Error('notValidId'))
+    .then((cards) => {
+      res.status(200).send(cards);
+    })
+    .catch((error) => {
+      if (error.message === 'notValidId') {
+        return res.status(404).send({ message: 'Не валидный id карточки' });
+      }
+      return res.status(500).send({ message: 'Произошла ошибка' });
+    });
 };
 
 const addLikeCard = (req: any, res: Response) => {
@@ -30,8 +44,14 @@ const addLikeCard = (req: any, res: Response) => {
     { $addToSet: { likes: req.user._id } },
     { new: true, runValidators: true },
   )
+    .orFail(new Error('notValidId'))
     .then((card) => res.send(card?.likes))
-    .catch(() => res.status(404).send({ message: 'Произошла ошибка: карточка не найден' }));
+    .catch((error) => {
+      if (error.message === 'notValidId') {
+        return res.status(404).send({ message: 'Не валидный id карточки' });
+      }
+      return res.status(500).send({ message: 'Произошла ошибка' });
+    });
 };
 
 const deleteLikeCard = (req: any, res: Response) => {
@@ -40,8 +60,14 @@ const deleteLikeCard = (req: any, res: Response) => {
     { $pull: { likes: req.user._id } },
     { new: true, runValidators: true },
   )
+    .orFail(new Error('notValidId'))
     .then((card) => res.send(card?.likes))
-    .catch(() => res.status(404).send({ message: 'Произошла ошибка: карточка не найден' }));
+    .catch((error) => {
+      if (error.message === 'notValidId') {
+        return res.status(404).send({ message: 'Не валидный id карточки' });
+      }
+      return res.status(500).send({ message: 'Произошла ошибка' });
+    });
 };
 // eslint-disable-next-line import/prefer-default-export
 export {
