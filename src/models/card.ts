@@ -1,4 +1,5 @@
 import { model, Schema } from 'mongoose';
+import validator from 'validator';
 // eslint-disable-next-line import/no-unresolved
 import ICard from 'types/card';
 
@@ -11,6 +12,10 @@ const cardShema = new Schema<ICard>({
   },
   link: {
     type: String,
+    validate: {
+      validator: (v: any) => validator.isURL(v),
+      message: 'Некорректный URL',
+    },
     required: true,
   },
   owner: {
