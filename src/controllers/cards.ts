@@ -23,6 +23,8 @@ const findCards = (req: Request, res: Response) => Card.find({})
   .then((cards) => res.send({ cards }))
   .catch(() => res.status(404).send({ message: 'Произошла ошибка: неверно заполнены поля' }));
 
+/* eslint no-else-return: "error" */
+
 const deleteCard = (req: Request, res: Response) => {
   const { cardId } = req.params;
   Card.findByIdAndDelete({ _id: cardId })
@@ -33,8 +35,11 @@ const deleteCard = (req: Request, res: Response) => {
     .catch((error) => {
       if (error.message === 'notValidId') {
         return res.status(404).send({ message: 'Не валидный id карточки' });
-      }
-      return res.status(500).send({ message: 'Произошла ошибка' });
+      } else if (error.message === 'CastError') {
+        return res.status(400).send({ message: 'Не валидный id карточки' });
+      } return res.status(500).send({ message: 'Произошла ошибка' });
+      // eslint-disable-next-line max-len
+      // я не могу поставить здесь else т.к его не принмимает eslint со ссылкой на избыточность такой конструкции. В целом я с ним согласен
     });
 };
 
@@ -44,13 +49,14 @@ const addLikeCard = (req: any, res: Response) => {
     { $addToSet: { likes: req.user._id } },
     { new: true, runValidators: true },
   )
-    .orFail(new Error('CastError'))
+    .orFail(new Error('notValidId'))
     .then((card) => res.send(card?.likes))
     .catch((error) => {
-      if (error.message === 'CastError') {
+      if (error.message === 'notValidId') {
         return res.status(404).send({ message: 'Не валидный id карточки' });
-      }
-      return res.status(500).send({ message: 'Произошла ошибка' });
+      } else if (error.message === 'CastError') {
+        return res.status(400).send({ message: 'Не валидный id карточки' });
+      } return res.status(500).send({ message: 'Произошла ошибка' });
     });
 };
 
@@ -60,13 +66,14 @@ const deleteLikeCard = (req: any, res: Response) => {
     { $pull: { likes: req.user._id } },
     { new: true, runValidators: true },
   )
-    .orFail(new Error('CastError'))
+    .orFail(new Error('notValidId'))
     .then((card) => res.send(card?.likes))
     .catch((error) => {
-      if (error.message === 'CastError') {
+      if (error.message === 'notValidId') {
         return res.status(404).send({ message: 'Не валидный id карточки' });
-      }
-      return res.status(500).send({ message: 'Произошла ошибка' });
+      } else if (error.message === 'CastError') {
+        return res.status(400).send({ message: 'Не валидный id карточки' });
+      } return res.status(500).send({ message: 'Произошла ошибка' });
     });
 };
 // eslint-disable-next-line import/prefer-default-export

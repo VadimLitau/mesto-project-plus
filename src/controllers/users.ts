@@ -32,9 +32,6 @@ const findUser = (req: Request, res: Response) => {
       if (error instanceof mongoose.Error.CastError) {
         return res.status(400).send({ message: 'Не валидный id пользователя' });
       }
-      if (error instanceof Error && error.name === 'NotFoundError') {
-        return res.status(404).send({ message: 'Пользователь не найден' });
-      }
       return res.status(500).send({ message: 'Произошла ошибка' });
     });
 };
@@ -65,3 +62,5 @@ const updateAvatar = (req: RequestCustom, res: Response) => {
 export {
   createUser, findUsers, findUser, updateUser, updateAvatar,
 };
+
+// В который раз убеждаюсь, что если хочется спать, то ненадо садиться за код)Спасибо за видео)
