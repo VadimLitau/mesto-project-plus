@@ -1,13 +1,37 @@
 import { Request, Response } from 'express';
 import mongoose from 'mongoose';
+// eslint-disable-next-line import/no-unresolved
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 import { RequestCustom } from '../types/user';
 // eslint-disable-next-line import/extensions, import/no-unresolved
 import User from '../models/user';
 
-const createUser = (req: Request, res: Response) => {
-  const { name, about, avatar } = req.body;
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const login = (req: Request, res: Response) => {
+  const { email, password } = req.body;
 
-  return User.create({ name, about, avatar })
+  return User.findUserByCredentials(email, password)
+    .then((user) => {
+      res.send({
+        token: jwt.sign({ _id: user._id }, 'super-strong-secret', { expiresIn: '10d' }),
+      });
+    })
+    .catch((err) => {
+      res.status(401).send({ message: err.message });
+    });
+};
+
+const createUser = (req: Request, res: Response) => {
+  const {
+    name, about, avatar, email, password,
+  } = req.body;
+
+  return bcrypt.hash(password, 10).then((hash) => {
+    User.create({
+      name, about, avatar, email, password: hash,
+    });
+  })
     .then((user) => res.send({ user }))
     .catch((error) => {
       if (error.name === 'ValidationError') {
@@ -59,8 +83,19 @@ const updateAvatar = (req: RequestCustom, res: Response) => {
       res.status(500).send({ message: 'Произошла ошибка' });
     });
 };
+
+const getMe = (req: RequestCustom, res: Response) => {
+  User.findById(req.user?._id)
+    .orFail(new Error('Пользователь не найден'))
+    .then((user) => res.send(user))
+    .catch((error) => {
+      if (error.message === 'Пользователь не найден') {
+        return res.status(404).send({ message: 'Пользователь не найден' });
+      } return res.status(500).send({ message: 'Произошла ошибка' });
+    });
+};
 export {
-  createUser, findUsers, findUser, updateUser, updateAvatar,
+  createUser, findUsers, findUser, updateUser, updateAvatar, login, getMe,
 };
 
 // В который раз убеждаюсь, что если хочется спать, то ненадо садиться за код)Спасибо за видео)

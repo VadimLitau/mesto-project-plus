@@ -25,12 +25,15 @@ const findCards = (req: Request, res: Response) => Card.find({})
 
 /* eslint no-else-return: "error" */
 
-const deleteCard = (req: Request, res: Response) => {
+const deleteCard = (req: RequestCustom, res: Response) => {
   const { cardId } = req.params;
   Card.findByIdAndDelete({ _id: cardId })
     .orFail(new Error('notValidId'))
     .then((cards) => {
-      res.status(200).send(cards);
+      if (req.user?._id !== cards?.owner.toString()) {
+        return res.status(400).send({ message: 'Нельзя удалить чужую карточку' });
+      }
+      return res.status(200).send(cards);
     })
     .catch((error) => {
       if (error.message === 'notValidId') {
@@ -39,7 +42,6 @@ const deleteCard = (req: Request, res: Response) => {
         return res.status(400).send({ message: 'Не валидный id карточки' });
       } return res.status(500).send({ message: 'Произошла ошибка' });
       // eslint-disable-next-line max-len
-      // я не могу поставить здесь else т.к его не принмимает eslint со ссылкой на избыточность такой конструкции. В целом я с ним согласен
     });
 };
 
