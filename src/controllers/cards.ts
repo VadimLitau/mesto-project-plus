@@ -1,9 +1,10 @@
-import { Response, Request } from 'express';
+import { Response, Request, NextFunction } from 'express';
 import { RequestCustom } from '../types/user';
 import Card from '../models/card';
+import { BadRequestErr, ForbiddenErr, NotFoundErr } from '../errors';
 // eslint-disable-next-line import/extensions, import/no-unresolved
 // eslint-disable-next-line max-len
-const createCard = (req: RequestCustom, res: Response) => {
+const createCard = (req: RequestCustom, res: Response, next: NextFunction) => {
   const { name, link } = req.body;
   const createdAt = new Date();
 
@@ -13,39 +14,41 @@ const createCard = (req: RequestCustom, res: Response) => {
     .then((card) => res.send({ card }))
     .catch((error) => {
       if (error.name === 'ValidationError') {
-        return res.status(400).send({ message: 'Произошла ошибка: неверно заполнены поля' });
+        next(new BadRequestErr(`${Object.values(error.errors).map((err:any) => err.message).join(', ')}`));
       }
-      return res.status(500).send({ message: 'Произошла ошибка' });
+      next(error);
     });
 };
 
-const findCards = (req: Request, res: Response) => Card.find({})
-  .then((cards) => res.send({ cards }))
-  .catch(() => res.status(404).send({ message: 'Произошла ошибка: неверно заполнены поля' }));
+const findCards = (req: Request, res: Response, next: NextFunction) => {
+  Card.find({})
+    .then((cards) => res.send({ cards }))
+    .catch((err) => next(err));
+};
 
 /* eslint no-else-return: "error" */
 
-const deleteCard = (req: RequestCustom, res: Response) => {
+const deleteCard = (req: RequestCustom, res: Response, next:NextFunction) => {
   const { cardId } = req.params;
-  Card.findByIdAndDelete({ _id: cardId })
+  Card.findById({ _id: cardId })
     .orFail(new Error('notValidId'))
     .then((cards) => {
       if (req.user?._id !== cards?.owner.toString()) {
-        return res.status(400).send({ message: 'Нельзя удалить чужую карточку' });
+        return next(new ForbiddenErr('Нельзя удалить чужую карточку'));
       }
       return res.status(200).send(cards);
     })
     .catch((error) => {
       if (error.message === 'notValidId') {
-        return res.status(404).send({ message: 'Не валидный id карточки' });
+        return next(new NotFoundErr('Не валидный id карточки'));
       } else if (error.message === 'CastError') {
-        return res.status(400).send({ message: 'Не валидный id карточки' });
-      } return res.status(500).send({ message: 'Произошла ошибка' });
+        return next(new BadRequestErr('Не валидный id карточки'));
+      } next(error);
       // eslint-disable-next-line max-len
     });
 };
 
-const addLikeCard = (req: any, res: Response) => {
+const addLikeCard = (req: any, res: Response, next: NextFunction) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $addToSet: { likes: req.user._id } },
@@ -55,14 +58,14 @@ const addLikeCard = (req: any, res: Response) => {
     .then((card) => res.send(card?.likes))
     .catch((error) => {
       if (error.message === 'notValidId') {
-        return res.status(404).send({ message: 'Не валидный id карточки' });
+        return next(new NotFoundErr('Не валидный id карточки'));
       } else if (error.message === 'CastError') {
-        return res.status(400).send({ message: 'Не валидный id карточки' });
-      } return res.status(500).send({ message: 'Произошла ошибка' });
+        return next(new BadRequestErr('Не валидный id карточки'));
+      } next(error);
     });
 };
 
-const deleteLikeCard = (req: any, res: Response) => {
+const deleteLikeCard = (req: any, res: Response, next: NextFunction) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $pull: { likes: req.user._id } },
@@ -72,10 +75,10 @@ const deleteLikeCard = (req: any, res: Response) => {
     .then((card) => res.send(card?.likes))
     .catch((error) => {
       if (error.message === 'notValidId') {
-        return res.status(404).send({ message: 'Не валидный id карточки' });
+        return next(new NotFoundErr('Не валидный id карточки'));
       } else if (error.message === 'CastError') {
-        return res.status(400).send({ message: 'Не валидный id карточки' });
-      } return res.status(500).send({ message: 'Произошла ошибка' });
+        return next(new BadRequestErr('Не валидный id карточки'));
+      } next(error);
     });
 };
 // eslint-disable-next-line import/prefer-default-export
