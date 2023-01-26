@@ -8,14 +8,14 @@ import { IUser, UserModel } from '../types/user';
 const userSchema = new Schema<IUser, UserModel>({
   name: {
     type: String,
-    minlength: 2,
-    maxlength: 30,
+    minlength: [2, 'Минимум 2 символа'],
+    maxlength: [30, 'Максимум 30 символов'],
     default: 'Жак-Ив Кусто',
   },
   about: {
     type: String,
-    minlength: 2,
-    maxlength: 200,
+    minlength: [2, 'Минимум 2 символа'],
+    maxlength: [200, 'Максимум 30 символов'],
     default: 'Исследователь',
   },
   avatar: {

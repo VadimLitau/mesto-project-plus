@@ -5,6 +5,7 @@ import user from './routes/users';
 import card from './routes/card';
 import { requestLogger, errorLogger } from './middlewares/logger';
 import { createUser, login } from './controllers/users';
+import errorHandler from './middlewares/errorHandler';
 import auth from './middlewares/auth';
 
 mongoose.connect('mongodb://localhost:27017/mestodb', { family: 4 });
@@ -29,6 +30,8 @@ app.get('*', (_req: any, _res: Response) => {
 });
 
 app.use(errorLogger);
+
+app.use(errorHandler);
 app.listen(PORT, () => {
   console.log('Ссылка на сервер:');
   console.log(PORT);
