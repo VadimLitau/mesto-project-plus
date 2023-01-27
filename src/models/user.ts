@@ -4,6 +4,7 @@ import validator from 'validator';
 import bcrypt from 'bcrypt';
 // eslint-disable-next-line import/no-unresolved, import/no-named-as-default
 import { IUser, UserModel } from '../types/user';
+import { validateLink } from '../middlewares/validation';
 
 const userSchema = new Schema<IUser, UserModel>({
   name: {
@@ -21,7 +22,7 @@ const userSchema = new Schema<IUser, UserModel>({
   avatar: {
     type: String,
     validate: {
-      validator: (v: any) => validator.isURL(v),
+      validator: validateLink,
       message: 'Некорректный URL',
     },
     default: 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',

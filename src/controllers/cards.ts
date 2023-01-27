@@ -36,6 +36,7 @@ const deleteCard = (req: RequestCustom, res: Response, next:NextFunction) => {
       if (req.user?._id !== cards?.owner.toString()) {
         return next(new ForbiddenErr('Нельзя удалить чужую карточку'));
       }
+      cards?.delete();
       return res.status(200).send(cards);
     })
     .catch((error) => {

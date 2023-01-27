@@ -35,7 +35,7 @@ const createUser = (req: Request, res: Response, next: NextFunction) => {
     .then(async (user) => {
       const test = await User.findOne({ email: req.body.email }).exec();
       if (test) {
-        throw new FoundEmailErr('Пользователь с такой почтой уже зарегистрирован');
+        return next(new FoundEmailErr('Пользователь с такой почтой уже зарегистрирован'));
       }
       res.status(200).send({ message: 'Регистрация прошла успешно', user });
     })
