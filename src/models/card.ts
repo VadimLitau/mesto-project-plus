@@ -1,7 +1,8 @@
 import { model, Schema } from 'mongoose';
-import validator from 'validator';
+// import validator from 'validator';
 // eslint-disable-next-line import/no-unresolved
 import ICard from 'types/card';
+import { validateLink } from '../middlewares/validation';
 
 const cardShema = new Schema<ICard>({
   name: {
@@ -13,7 +14,7 @@ const cardShema = new Schema<ICard>({
   link: {
     type: String,
     validate: {
-      validator: (v: any) => validator.isURL(v),
+      validator: validateLink,
       message: 'Некорректный URL',
     },
     required: true,
