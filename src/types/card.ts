@@ -1,5 +1,5 @@
 import { Schema } from 'mongoose';
-import IUser from './user';
+import { IUser } from './user';
 
 interface ICard {
   name: string,

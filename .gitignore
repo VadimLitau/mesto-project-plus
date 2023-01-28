@@ -2,6 +2,9 @@
 logs
 *.log
 npm-debug.log*
+yarn-error.log
+yarn-debug.log
+lerna-debug.log
 
 # Dependency directory
 node_modules
@@ -16,3 +19,4 @@ node_modules
 
 # Typescript build result
 dist
+.env
