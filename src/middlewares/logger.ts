@@ -3,7 +3,7 @@ import expressWinston from 'express-winston';
 import 'winston-daily-rotate-file';
 
 const transport = new winston.transports.DailyRotateFile({
-  filename: 'error-%DATE%.log',
+  filename: 'logs/error-%DATE%.log',
   datePattern: 'YYYY-MM-DD-HH',
   maxSize: '20m',
   maxFiles: 10,
