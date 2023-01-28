@@ -10,11 +10,12 @@ import { BadRequestErr, FoundEmailErr, NotFoundErr } from '../errors';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const login = (req: Request, res: Response, next: NextFunction) => {
   const { email, password } = req.body;
+  const { SECRET_KEY = 'super-strong-secret' } = process.env;
 
   return User.findUserByCredentials(email, password)
     .then((user) => {
       res.send({
-        token: jwt.sign({ _id: user._id }, 'super-strong-secret', { expiresIn: '10d' }),
+        token: jwt.sign({ _id: user._id }, SECRET_KEY, { expiresIn: '10d' }),
       });
     })
     .catch((err) => {

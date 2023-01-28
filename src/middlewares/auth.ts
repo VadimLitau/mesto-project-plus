@@ -10,9 +10,10 @@ export default (req: SessionCustom, res: Response, next: NextFunction) => {
   }
 
   const token = authorization.replace('Bearer ', '');
+  const { SECRET_KEY = 'super-strong-secret' } = process.env;
   let payload;
   try {
-    payload = jwt.verify(token, 'super-strong-secret');
+    payload = jwt.verify(token, SECRET_KEY);
   } catch (error:any) {
     return res.status(401).send({ message: error });
   }
