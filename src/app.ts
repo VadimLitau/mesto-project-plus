@@ -1,7 +1,6 @@
 import express, { Response, json } from 'express';
 import mongoose from 'mongoose';
 import { errors } from 'celebrate';
-import * as dotenv from 'dotenv';
 // eslint-disable-next-line import/extensions, import/named
 import user from './routes/users';
 import card from './routes/card';
@@ -10,10 +9,7 @@ import { createUser, login } from './controllers/users';
 import errorHandler from './middlewares/errorHandler';
 import auth from './middlewares/auth';
 import { validateCreateUser, validateLogin } from './middlewares/validation';
-
-dotenv.config();
-
-const { PORT, MONGO_URL = 'mongodb://localhost:27017/mestodb' } = process.env;
+import { PORT, MONGO_URL } from '../config';
 
 mongoose.set('strictQuery', false);
 mongoose.connect(MONGO_URL, { family: 4 });

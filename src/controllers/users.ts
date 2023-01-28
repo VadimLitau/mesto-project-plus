@@ -6,11 +6,11 @@ import { RequestCustom } from '../types/user';
 // eslint-disable-next-line import/extensions, import/no-unresolved
 import User from '../models/user';
 import { BadRequestErr, FoundEmailErr, NotFoundErr } from '../errors';
+import { SECRET_KEY } from '../../config';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const login = (req: Request, res: Response, next: NextFunction) => {
   const { email, password } = req.body;
-  const { SECRET_KEY = 'super-strong-secret' } = process.env;
 
   return User.findUserByCredentials(email, password)
     .then((user) => {

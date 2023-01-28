@@ -1,6 +1,7 @@
 import { NextFunction, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import { SessionCustom } from '../types/user';
+import { SECRET_KEY } from '../../config';
 
 export default (req: SessionCustom, res: Response, next: NextFunction) => {
   const { authorization } = req.headers;
@@ -10,7 +11,6 @@ export default (req: SessionCustom, res: Response, next: NextFunction) => {
   }
 
   const token = authorization.replace('Bearer ', '');
-  const { SECRET_KEY = 'super-strong-secret' } = process.env;
   let payload;
   try {
     payload = jwt.verify(token, SECRET_KEY);
